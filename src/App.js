@@ -7,12 +7,19 @@ function App() {
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
   const [cart, setCart] = useState([]);
+  const [userCredentials, setUserCredentials] = useState({
+    name: '',
+    address: '',
+    phone: '',
+    email: '',
+    password: ''
+  });
 
   useEffect(() => {
-    if (query) {
+    if (query && !userModalOpen) {
       searchBooks();
     }
-  }, [query]);
+  }, [query, userModalOpen]);
 
   const searchBooks = async () => {
     try {
@@ -54,6 +61,17 @@ function App() {
     setUserModalOpen(false);
   };
 
+  const handleUserInputChange = (event) => {
+    const { name, value } = event.target;
+    setUserCredentials({ ...userCredentials, [name]: value });
+  };
+
+  const handleSubmitUserCredentials = (event) => {
+    event.preventDefault();
+    // Aquí puedes manejar la lógica para enviar los datos del usuario a tu backend o hacer lo que necesites con ellos
+    console.log(userCredentials);
+  };
+
   const handleAddToCart = () => {
     const newBook = { title: bookData.volumeInfo.title, price: 10 }; // Asumiendo un precio de $10 por libro
     setCart([...cart, newBook]);
@@ -64,13 +82,17 @@ function App() {
       <header className="App-header">
         <h1>RABE Librería</h1>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
-          <button onClick={handleOpenUserModal}>Usuario</button>
+          {!userModalOpen && <button onClick={handleOpenUserModal}>Usuario</button>}
           <button onClick={() => alert("Carrito de compras")}>Carrito</button>
           <button onClick={() => alert("Configuraciones")}>Configuraciones</button>
         </div>
         <div>
-          <input type="text" placeholder="Buscar libro..." value={query} onChange={handleInputChange} />
-          <button onClick={handleSearch}>Buscar</button>
+          {!userModalOpen && (
+            <>
+              <input type="text" placeholder="Buscar libro..." value={query} onChange={handleInputChange} />
+              <button onClick={handleSearch}>Buscar</button>
+            </>
+          )}
         </div>
         {bookData && (
           <div className="book-info">
@@ -105,7 +127,29 @@ function App() {
           <div className="modal-content">
             <span className="close" onClick={handleCloseUserModal}>&times;</span>
             <h2>Usuario</h2>
-            {/* Aquí puedes colocar el formulario de inicio de sesión o registro */}
+            <form onSubmit={handleSubmitUserCredentials}>
+              <label>
+                Nombre:
+                <input type="text" name="name" value={userCredentials.name} onChange={handleUserInputChange} />
+              </label>
+              <label>
+                Dirección:
+                <input type="text" name="address" value={userCredentials.address} onChange={handleUserInputChange} />
+              </label>
+              <label>
+                Teléfono:
+                <input type="text" name="phone" value={userCredentials.phone} onChange={handleUserInputChange} />
+              </label>
+              <label>
+                Correo:
+                <input type="email" name="email" value={userCredentials.email} onChange={handleUserInputChange} />
+              </label>
+              <label>
+                Contraseña:
+                <input type="password" name="password" value={userCredentials.password} onChange={handleUserInputChange} />
+              </label>
+              <button type="submit">Enviar</button>
+            </form>
           </div>
         </div>
       )}
