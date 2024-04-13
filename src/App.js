@@ -6,6 +6,7 @@ function App() {
   const [bookData, setBookData] = useState(null);
   const [relatedBooks, setRelatedBooks] = useState([]);
   const [userModalOpen, setUserModalOpen] = useState(false);
+  const [loginForm, setLoginForm] = useState(true);
   const [cart, setCart] = useState([]);
   const [userCredentials, setUserCredentials] = useState({
     name: '',
@@ -52,6 +53,7 @@ function App() {
 
   const handleOpenUserModal = () => {
     setUserModalOpen(true);
+    setLoginForm(true); // Establecer el formulario de inicio de sesión como activo por defecto
     setBookData(null); // Limpiar la información del libro
     setRelatedBooks([]); // Limpiar los libros relacionados
     setQuery(''); // Limpiar el texto de búsqueda
@@ -70,6 +72,10 @@ function App() {
     event.preventDefault();
     // Aquí puedes manejar la lógica para enviar los datos del usuario a tu backend o hacer lo que necesites con ellos
     console.log(userCredentials);
+  };
+
+  const handleToggleForm = () => {
+    setLoginForm(!loginForm);
   };
 
   const handleAddToCart = () => {
@@ -127,29 +133,45 @@ function App() {
           <div className="modal-content">
             <span className="close" onClick={handleCloseUserModal}>&times;</span>
             <h2>Usuario</h2>
-            <form onSubmit={handleSubmitUserCredentials}>
-              <label>
-                Nombre:
-                <input type="text" name="name" value={userCredentials.name} onChange={handleUserInputChange} />
-              </label>
-              <label>
-                Dirección:
-                <input type="text" name="address" value={userCredentials.address} onChange={handleUserInputChange} />
-              </label>
-              <label>
-                Teléfono:
-                <input type="text" name="phone" value={userCredentials.phone} onChange={handleUserInputChange} />
-              </label>
-              <label>
-                Correo:
-                <input type="email" name="email" value={userCredentials.email} onChange={handleUserInputChange} />
-              </label>
-              <label>
-                Contraseña:
-                <input type="password" name="password" value={userCredentials.password} onChange={handleUserInputChange} />
-              </label>
-              <button type="submit">Enviar</button>
-            </form>
+            {loginForm ? (
+              <form onSubmit={handleSubmitUserCredentials} style={{ display: 'flex', flexDirection: 'column' }}>
+                <label>
+                  Correo:
+                  <input type="email" name="email" value={userCredentials.email} onChange={handleUserInputChange} />
+                </label>
+                <label>
+                  Contraseña:
+                  <input type="password" name="password" value={userCredentials.password} onChange={handleUserInputChange} />
+                </label>
+                <button type="submit">Iniciar Sesión</button>
+                <button type="button" onClick={handleToggleForm}>Registrarse</button>
+              </form>
+            ) : (
+              <form onSubmit={handleSubmitUserCredentials} style={{ display: 'flex', flexDirection: 'column' }}>
+                <label>
+                  Nombre:
+                  <input type="text" name="name" value={userCredentials.name} onChange={handleUserInputChange} />
+                </label>
+                <label>
+                  Dirección:
+                  <input type="text" name="address" value={userCredentials.address} onChange={handleUserInputChange} />
+                </label>
+                <label>
+                  Teléfono:
+                  <input type="text" name="phone" value={userCredentials.phone} onChange={handleUserInputChange} />
+                </label>
+                <label>
+                  Correo:
+                  <input type="email" name="email" value={userCredentials.email} onChange={handleUserInputChange} />
+                </label>
+                <label>
+                  Contraseña:
+                  <input type="password" name="password" value={userCredentials.password} onChange={handleUserInputChange} />
+                </label>
+                <button type="submit">Registrarse</button>
+                <button type="button" onClick={handleToggleForm}>Iniciar Sesión</button>
+              </form>
+            )}
           </div>
         </div>
       )}
