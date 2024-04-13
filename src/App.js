@@ -15,6 +15,8 @@ function App() {
     email: '',
     password: ''
   });
+  const [modalWidth, setModalWidth] = useState(400); // Ancho de la ventana modal
+  const [modalHeight, setModalHeight] = useState(300); // Altura de la ventana modal
 
   useEffect(() => {
     if (query && !userModalOpen) {
@@ -53,6 +55,8 @@ function App() {
 
   const handleOpenUserModal = () => {
     setUserModalOpen(true);
+    setModalWidth(200); // Establecer el ancho deseado
+    setModalHeight(100); // Establecer la altura deseada
     setLoginForm(true); // Establecer el formulario de inicio de sesión como activo por defecto
     setBookData(null); // Limpiar la información del libro
     setRelatedBooks([]); // Limpiar los libros relacionados
@@ -165,7 +169,7 @@ function App() {
         )}
       </header>
       {userModalOpen && (
-        <div className="modal">
+        <div className="modal" style={{ width: `${modalWidth}px`, height: `${modalHeight}px` }}>
           <div className="modal-content">
             <span className="close" onClick={handleCloseUserModal}>&times;</span>
             <h2>{loginForm ? 'Inicio de Sesión' : 'Registro'}</h2>
@@ -242,9 +246,9 @@ function App() {
                                 setCart(updatedCart);
                               }
                             }}>-</button>
-                            <button onClick={() => handleRemoveFromCart(index)}>Eliminar</button>
                           </div>
                         </div>
+                        <button onClick={() => handleRemoveFromCart(index)}>Eliminar</button>
                       </li>
                     ))}
                   </ul>
