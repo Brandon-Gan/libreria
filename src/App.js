@@ -79,8 +79,44 @@ function App() {
   };
 
   const handleAddToCart = () => {
-    const newBook = { title: bookData.volumeInfo.title, price: 10 }; // Asumiendo un precio de $10 por libro
-    setCart([...cart, newBook]);
+    const existingBookIndex = cart.findIndex(item => item.title === bookData.volumeInfo.title);
+    if (existingBookIndex !== -1) {
+      // Si el libro ya está en el carrito, aumentamos su cantidad
+      const updatedCart = [...cart];
+      updatedCart[existingBookIndex].quantity += 1;
+      setCart(updatedCart);
+    } else {
+      // Si el libro no está en el carrito, lo agregamos con una cantidad inicial de 1
+      const newBook = { 
+        title: bookData.volumeInfo.title, 
+        price: 25, // Costo base de $25 por libro
+        thumbnail: bookData.volumeInfo.imageLinks.thumbnail,
+        quantity: 1
+      };
+      setCart([...cart, newBook]);
+    }
+  };
+
+  const handleOpenCartModal = () => {
+    setUserModalOpen(true);
+    setLoginForm(false); // No mostramos ningún formulario en la ventana modal
+    setBookData(null); // Limpiar la información del libro
+    setRelatedBooks([]); // Limpiar los libros relacionados
+    setQuery(''); // Limpiar el texto de búsqueda
+  };
+
+  const handleClearCart = () => {
+    setCart([]);
+  };
+
+  const handleRemoveFromCart = (index) => {
+    const updatedCart = [...cart];
+    updatedCart.splice(index, 1);
+    setCart(updatedCart);
+  };
+
+  const getTotalCost = () => {
+    return cart.reduce((total, book) => total + (book.price * book.quantity), 0);
   };
 
   return (
@@ -89,7 +125,7 @@ function App() {
         <h1>RABE Librería</h1>
         <div style={{ display: 'flex', justifyContent: 'flex-end', marginBottom: '20px' }}>
           {!userModalOpen && <button onClick={handleOpenUserModal}>Usuario</button>}
-          <button onClick={() => alert("Carrito de compras")}>Carrito</button>
+          <button onClick={handleOpenCartModal}>Carrito</button>
           <button onClick={() => alert("Configuraciones")}>Configuraciones</button>
         </div>
         <div>
@@ -132,7 +168,7 @@ function App() {
         <div className="modal">
           <div className="modal-content">
             <span className="close" onClick={handleCloseUserModal}>&times;</span>
-            <h2>Usuario</h2>
+            <h2>{loginForm ? 'Inicio de Sesión' : 'Registro'}</h2>
             {loginForm ? (
               <form onSubmit={handleSubmitUserCredentials} style={{ display: 'flex', flexDirection: 'column' }}>
                 <label>
@@ -172,6 +208,51 @@ function App() {
                 <button type="button" onClick={handleToggleForm}>Iniciar Sesión</button>
               </form>
             )}
+          </div>
+        </div>
+      )}
+      {userModalOpen && (
+        <div className="modal">
+          <div className="modal-content">
+            <span className="close" onClick={handleCloseUserModal}>&times;</span>
+            <h2>Carrito</h2>
+            <div>
+              {cart.length === 0 ? (
+                <p>No hay libros en el carrito.</p>
+              ) : (
+                <>
+                  <ul>
+                    {cart.map((item, index) => (
+                      <li key={index} style={{ display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+                        <div style={{ marginRight: '10px' }}>
+                          <img src={item.thumbnail} alt="Portada del libro" style={{ width: '50px', height: '70px' }} />
+                        </div>
+                        <div>
+                          <p>{item.title} - ${item.price} x {item.quantity}</p>
+                          <div>
+                            <button onClick={() => {
+                              const updatedCart = [...cart];
+                              updatedCart[index].quantity += 1;
+                              setCart(updatedCart);
+                            }}>+</button>
+                            <button onClick={() => {
+                              const updatedCart = [...cart];
+                              if (updatedCart[index].quantity > 1) {
+                                updatedCart[index].quantity -= 1;
+                                setCart(updatedCart);
+                              }
+                            }}>-</button>
+                            <button onClick={() => handleRemoveFromCart(index)}>Eliminar</button>
+                          </div>
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                  <p>Total: ${getTotalCost()}</p>
+                </>
+              )}
+              <button onClick={handleClearCart}>Limpiar Carrito</button>
+            </div>
           </div>
         </div>
       )}
